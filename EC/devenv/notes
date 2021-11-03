@@ -1,0 +1,9 @@
+docker build -t ec2091 .
+docker run -it ec2019 
+docker run --volume $(pwd)/Memory/Memory:/root/Memory -it ec2019 
+
+jwasm -coff prac.asm
+/usr/bin/i686-w64-mingw32-g++ -c  memory.cpp
+/usr/bin/i686-w64-mingw32-g++ memory.o prac.o -static-libgcc -static-libstdc++
+
+to run use wineconsole a.exe to avoid format errors
