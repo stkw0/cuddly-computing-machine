@@ -15,29 +15,6 @@ initialPosition_C PROTO C
 
 .code   
    
-;;Macros que guarden y recuperen de la pila els registres de proposit general de la arquitectura de 32 bits de Intel  
-Push_all macro
-	
-	push eax
-   	push ebx
-    push ecx
-    push edx
-    push esi
-    push edi
-endm
-
-
-Pop_all macro
-
-	pop edi
-   	pop esi
-   	pop edx
-   	pop ecx
-   	pop ebx
-   	pop eax
-endm
-   
-   
 public C posCurScreenP1, getMoveP1, moveCursorP1, movContinuoP1, openP1, openContinuousP1
                          
 
@@ -61,7 +38,7 @@ extern C neighbours: SDWORD, marks: SDWORD, endGame: SDWORD
 gotoxy proc
    push ebp
    mov  ebp, esp
-   Push_all
+   pushad
 
    ; Quan cridem la funció gotoxy_C(int row_num, int col_num) des d'assemblador 
    ; els paràmetres s'han de passar per la pila
@@ -74,10 +51,9 @@ gotoxy proc
    pop eax
    pop eax 
    
-   Pop_all
+   popad
 
-   mov esp, ebp
-   pop ebp
+   leave
    ret
 gotoxy endp
 
@@ -98,7 +74,7 @@ printch proc
    ;les funcions de C no mantenen l'estat dels registres.
    
    
-   Push_all
+   pushad
    
 
    ; Quan cridem la funció  printch_C(char c) des d'assemblador, 
@@ -110,10 +86,9 @@ printch proc
    call printChar_C
  
    pop eax
-   Pop_all
+   popad
 
-   mov esp, ebp
-   pop ebp
+   leave
    ret
 printch endp
    
@@ -131,17 +106,16 @@ getch proc
    mov  ebp, esp
     
    ;push eax
-   Push_all
+   pushad
 
    call getch_C
    
    mov [carac2],al
    
    ;pop eax
-   Pop_all
+   popad
 
-   mov esp, ebp
-   pop ebp
+   leave
    ret
 getch endp
 
@@ -166,13 +140,26 @@ getch endp
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;posCurScreenP1:
 posCurScreenP1 proc
-    push ebp
+   push ebp
 	mov  ebp, esp
 
-	
+   dec [row]
+   sub [col], 'A'
+   
+   shl [row], 1
+   shl [col], 2
 
-	mov esp, ebp
-	pop ebp
+   mov ebx, [rowScreenIni]
+   add ebx, [row]
+   mov [rowScreen], ebx
+
+   mov ebx, [colScreenIni]
+   add bl, [col]
+   mov [colScreen], ebx
+
+   call gotoxy
+
+   leave
 	ret
 posCurScreenP1 endp
 
@@ -191,8 +178,29 @@ getMoveP1 proc
    push ebp
    mov  ebp, esp
 
-   mov esp, ebp
-   pop ebp
+read_again:
+
+   call getch
+
+   mov al, [carac2]
+   
+   cmp al, ' '
+   je ok
+   
+   cmp al, 'm'
+   je ok
+   
+   cmp al, 's'
+   je ok
+   
+   cmp al, 'i'
+   jl read_again
+
+   cmp al, 'l'
+   jg read_again
+
+ok:
+   leave
    ret
 getMoveP1 endp
 
@@ -217,8 +225,43 @@ moveCursorP1 proc
    push ebp
    mov  ebp, esp 
 
-   mov esp, ebp
-   pop ebp
+   mov al, [carac2]
+   cmp al, 'i'
+   je move_up
+   cmp al, 'k'
+   je move_down
+   cmp al, 'j'
+   je move_left
+   cmp al, 'l'
+   je move_right
+   jmp bye
+
+move_up:
+   cmp [rowCur], 1
+   jle bye
+   dec [rowCur]
+   jmp bye
+
+move_down:
+   cmp [rowCur], 8
+   jge bye 
+   inc [rowCur]
+   jmp bye
+
+move_left:
+   cmp [colCur], 0+'A'
+   jle bye
+   dec [colCur]
+   jmp bye 
+
+move_right:
+   cmp [colCur], 7+'A'
+   jge bye 
+   inc [colCur]
+   jmp bye 
+
+bye:
+   leave
    ret
 moveCursorP1 endp
 
@@ -238,10 +281,28 @@ movContinuoP1 proc
 	push ebp
 	mov  ebp, esp
 
-	
+next_move:
+   call getMoveP1
+   cmp [carac2], 's'
+   je bye
 
-	mov esp, ebp
-	pop ebp
+   cmp [carac2], ' '
+   je bye
+
+   cmp [carac2], 'm'
+   je bye
+
+   call moveCursorP1
+
+   mov ebx, [rowCur]
+   mov al, [colCur]
+   mov [row], ebx
+   mov [col], al
+   call posCurScreenP1
+   jmp next_move
+
+bye:
+	leave
 	ret
 movContinuoP1 endp
 
@@ -260,11 +321,17 @@ movContinuoP1 endp
 calcIndexP1 proc
 	push ebp
 	mov  ebp, esp
-	
-	
 
-	mov esp, ebp
-	pop ebp
+   xor ebx, ebx
+
+   mov eax, [row]
+   mov bl, [col]
+	sub bl, 'A'
+   shl eax, 3
+   add eax, ebx
+   mov [indexMat], eax
+
+	leave
 	ret
 calcIndexP1 endp
 
@@ -276,7 +343,7 @@ calcIndexP1 endp
 ; En cas de que la casella no estigui oberta ni marcada mostrar:
 ;	- 'X' si hi ha una mina
 ;	- 'm' si volem marcar la casella
-;	- el numero de veïns si obrim una casella sense mina (crida a la subrutina sumNeighbours)
+;	- el numero de veïns si obrim una casella sense mina 
 ; En cas de que la casella estigui marcada mostrar:
 ;	- ' ' si volem desmarcar la casella
 ; Mostrarem el contingut de la casella criant a la subrutina printch. L'índex per
@@ -304,10 +371,35 @@ openP1 proc
 	push ebp
 	mov  ebp, esp
 
-	
 
-	mov esp, ebp
-	pop ebp
+   call calcIndexP1
+   cmp [carac2], ' '
+   je desmarcar
+   cmp [carac2], 'm'
+   je marcar
+   jmp  bye
+
+
+marcar:
+   mov [carac], 'm'
+   call printch
+   jmp bye
+
+desmarcar:
+   mov eax, [indexMat]
+   cmp [mineField + eax], 0
+   jge no_minas
+   mov [carac], '1'
+   call printch
+   jmp bye 
+
+
+no_minas:
+   mov [carac], '0'
+   call printch
+
+bye:
+	leave
 	ret
 openP1 endp
 
@@ -330,6 +422,17 @@ openP1 endp
 openContinuousP1 proc
 	push ebp
 	mov  ebp, esp
+
+
+repetir:
+   call movContinuoP1
+   call openP1
+   cmp [carac2], 's'
+   je bye
+   jmp repetir
+
+
+   bye:
 
 	
 
