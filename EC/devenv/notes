@@ -7,3 +7,4 @@ jwasm -coff prac.asm
 /usr/bin/i686-w64-mingw32-g++ memory.o prac.o -static-libgcc -static-libstdc++
 
 to run use wineconsole a.exe to avoid format errors
+iconv -f UTF-16 -t ASCII//TRANSLIT main.cpp -o main.cpp
