@@ -326,8 +326,8 @@ calcIndexP1 proc
 
    mov eax, [row]
    mov bl, [col]
-	sub bl, 'A'
-   shl eax, 3
+   shr bl, 2
+   shl eax, 2
    add eax, ebx
    mov [indexMat], eax
 
@@ -373,6 +373,7 @@ openP1 proc
 
 
    call calcIndexP1
+   mov eax, [indexMat]
    cmp [carac2], ' '
    je desmarcar
    cmp [carac2], 'm'
@@ -381,15 +382,18 @@ openP1 proc
 
 
 marcar:
+   mov [taulell + eax], 'm'
    mov [carac], 'm'
    call printch
    jmp bye
 
 desmarcar:
-   mov eax, [indexMat]
-   cmp [mineField + eax], 0
-   jge no_minas
-   mov [carac], '1'
+  
+   mov bl, [mineField + eax]
+   cmp bl, 0
+   je no_minas
+   add bl, '0'
+   mov [carac], bl 
    call printch
    jmp bye 
 
@@ -399,6 +403,7 @@ no_minas:
    call printch
 
 bye:
+   call updateMarks
 	leave
 	ret
 openP1 endp
@@ -436,8 +441,75 @@ repetir:
 
 	
 
-	mov esp, ebp
-	pop ebp
+	leave
 	ret
 openContinuousP1 endp
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; 
+; Modificar el nombre de marques encara disponibles. 
+; Recórrer el taullel per comptar les marques posades ('m') i restar aquest valor a les inicials (9). 
+; Imprimir el nou valor a la posició indicada (rowScreen = 3, colScreen = 57), tenint 
+; en compte que hi haurem de sumar el valor '0' pel format ASCII. 
+; 
+; Variables utilitzades:  
+; taulell   : Matriu en la que anem indicant els valors de les nostres tirades  
+; rowScreen : Fila de la pantalla 
+; colScreen : Columna de la pantalla 
+; marks     : Nombre de mines no marcades 
+; 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; 
+updateMarks proc 
+ push ebp 
+ mov  ebp, esp 
+ 
+ xor ecx, ecx
+ mov [marks], 9
+
+bucle:
+ cmp ecx, 64
+ je bye
+
+ xor eax, eax
+ ;mov eax, [indexMat]
+ cmp [taulell + ecx], 'm'
+ je dec_mark
+dec_done:
+ ;lahf ; load flags into AH
+ ;shr eax, 6
+ ;and eax, 01b 
+ ;sub [marks], eax
+
+ inc ecx
+ jmp bucle
+
+ dec_mark:
+   dec [marks]
+   jmp dec_done
+
+bye:
+ mov [rowScreen], 3
+ mov [colScreen], 57
+ call gotoxy
+
+    mov ebx, [marks]
+   add ebx, '0' 
+   mov [carac], bl
+   call printch
+
+ leave
+ ret 
+updateMarks endp
+
 END
+
+COMMENT @
+extern "C" char mineField[8][8] = {
+{ 1,0,0,0,0,0,0,0 },
+{ 0,0,0,1,0,0,1,0 },
+{ 0,0,0,0,0,0,0,0 },
+{ 0,1,0,0,0,1,0,0 },
+{ 0,0,0,0,0,0,0,0 },
+{ 0,0,0,1,0,1,0,0 },
+{ 0,0,0,0,0,0,0,0 },
+{ 0,1,0,0,1,0,0,0 } 
+@
