@@ -27,8 +27,8 @@ extern C neighbours: SDWORD, marks: SDWORD, endGame: SDWORD
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Situar el cursor en una fila i una columna de la pantalla
-; en funciÛ de la fila i columna indicats per les variables colScreen i rowScreen
-; cridant a la funciÛ gotoxy_C.
+; en funci√≥ de la fila i columna indicats per les variables colScreen i rowScreen
+; cridant a la funci√≥ gotoxy_C.
 ;
 ; Variables utilitzades: 
 ; Cap
@@ -40,8 +40,8 @@ gotoxy proc
    mov  ebp, esp
    pushad
 
-   ; Quan cridem la funciÛ gotoxy_C(int row_num, int col_num) des d'assemblador 
-   ; els par‡metres s'han de passar per la pila
+   ; Quan cridem la funci√≥ gotoxy_C(int row_num, int col_num) des d'assemblador 
+   ; els par√†metres s'han de passar per la pila
       
    mov eax, [colScreen]
    push eax
@@ -58,27 +58,27 @@ gotoxy proc
 gotoxy endp
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; Mostrar un car‡cter, guardat a la variable carac
-; en la pantalla en la posiciÛ on est‡† el cursor,  
-; cridant a la funciÛ printChar_C.
+; Mostrar un car√†cter, guardat a la variable carac
+; en la pantalla en la posici√≥ on est√†¬† el cursor,  
+; cridant a la funci√≥ printChar_C.
 ; 
 ; Variables utilitzades: 
-; carac : variable on est‡ emmagatzemat el caracter a treure per pantalla
+; carac : variable on est√† emmagatzemat el caracter a treure per pantalla
 ; 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;printch:
 printch proc
    push ebp
    mov  ebp, esp
-   ;guardem l'estat dels registres del processador perquÈ
+   ;guardem l'estat dels registres del processador perqu√©
    ;les funcions de C no mantenen l'estat dels registres.
    
    
    pushad
    
 
-   ; Quan cridem la funciÛ  printch_C(char c) des d'assemblador, 
-   ; el par‡metre (carac) s'ha de passar per la pila.
+   ; Quan cridem la funci√≥  printch_C(char c) des d'assemblador, 
+   ; el par√†metre (carac) s'ha de passar per la pila.
  
    xor eax,eax
    mov  al, [carac]
@@ -93,8 +93,8 @@ printch proc
 printch endp
    
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; Llegir un car‡cter de teclat   
-; cridant a la funciÛ getch_C
+; Llegir un car√†cter de teclat   
+; cridant a la funci√≥ getch_C
 ; i deixar-lo a la variable carac2.
 ;
 ; Variables utilitzades: 
@@ -120,13 +120,13 @@ getch proc
 getch endp
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; Posicionar el cursor a la pantalla, dins el tauler, en funciÛ de
+; Posicionar el cursor a la pantalla, dins el tauler, en funci√≥ de
 ; les variables (row) fila (int) i (col) columna (char), a partir dels
 ; valors de les constants RowScreenIni i ColScreenIni.
 ; Primer cal restar 1 a row (fila) per a que quedi entre 0 i 7 
-; i convertir el char de la columna (A..H) a un n˙mero entre 0 i 7.
-; Per calcular la posiciÛ del cursor a pantalla (rowScreen) i 
-; (colScreen) utilitzar aquestes fÛrmules:
+; i convertir el char de la columna (A..H) a un n√∫mero entre 0 i 7.
+; Per calcular la posici√≥ del cursor a pantalla (rowScreen) i 
+; (colScreen) utilitzar aquestes f√≥rmules:
 ; rowScreen=rowScreenIni+(row*2)
 ; colScreen=colScreenIni+(col*4)
 ; Per a posicionar el cursor cridar a la subrutina gotoxy.
@@ -164,13 +164,13 @@ posCurScreenP1 proc
 posCurScreenP1 endp
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; Llegir un car‡cter de teclat   
+; Llegir un car√†cter de teclat   
 ; cridant a la subrutina getch
 ; Verificar que solament es pot introduir valors entre 'i' i 'l', 
 ; o les tecles espai ' ', 'm' o 's' i deixar-lo a la variable carac2.
 ; 
 ; Variables utilitzades: 
-; carac2 : Variable on s'emmagatzema el car‡cter llegit
+; carac2 : Variable on s'emmagatzema el car√†cter llegit
 ; 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;getMoveP1:
@@ -205,16 +205,16 @@ ok:
 getMoveP1 endp
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; Actualitzar les variables (rowCur) i (colCur) en funciÛ de 
+; Actualitzar les variables (rowCur) i (colCur) en funci√≥ de 
 ; la tecla premuda que tenim a la variable (carac2)
 ; (i: amunt, j:esquerra, k:avall, l:dreta).
-; Comprovar que no sortim del taulell, (rowCur) i (colCur) nomÈs poden 
+; Comprovar que no sortim del taulell, (rowCur) i (colCur) nom√©s poden 
 ; prendre els valors [1..8] i [0..7]. Si al fer el moviment es surt 
 ; del tauler, no fer el moviment.
 ; No posicionar el cursor a la pantalla, es fa a posCurScreenP1.
 ; 
 ; Variables utilitzades: 
-; carac2 : car‡cter llegit de teclat
+; carac2 : car√†cter llegit de teclat
 ;          'i': amunt, 'j':esquerra, 'k':avall, 'l':dreta
 ; rowCur : fila del cursor a la matriu mineField.
 ; colCur : columna del cursor a la matriu mineField.
@@ -269,7 +269,7 @@ moveCursorP1 endp
 ; Subrutina que implementa el moviment continuo. 
 ;
 ; Variables utilitzades: 
-;		carac2   : variable on síemmagatzema el car‡cter llegit
+;		carac2   : variable on s‚Äôemmagatzema el car√†cter llegit
 ;		rowCur   : Fila del cursor a la matriu mineField
 ;		colCur   : Columna del cursor a la matriu mineField
 ;		row      : Fila per a accedir a la matriu mineField
@@ -307,14 +307,14 @@ bye:
 movContinuoP1 endp
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; Calcular l'Ìndex per a accedir a les matrius en assemblador.
-; mineField[row][col] en C, Ès [mineField+indexMat] en assemblador.
-; on indexMat = row*8 + col (col convertir a n˙mero).
+; Calcular l'√≠ndex per a accedir a les matrius en assemblador.
+; mineField[row][col] en C, √©s [mineField+indexMat] en assemblador.
+; on indexMat = row*8 + col (col convertir a n√∫mero).
 ;
 ; Variables utilitzades:	
 ; row       : fila per a accedir a la matriu mineField
 ; col       : columna per a accedir a la matriu mineField
-; indexMat  : Ìndex per a accedir a la matriu mineField
+; indexMat  : √≠ndex per a accedir a la matriu mineField
 ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;calcIndexP1: proc endp
@@ -337,32 +337,32 @@ calcIndexP1 endp
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Obrim una casella de la matriu mineField
-; En primer lloc calcular la posiciÛ de la matriu corresponent a la
-; posiciÛ que ocupa el cursor a la pantalla, cridant a la 
+; En primer lloc calcular la posici√≥ de la matriu corresponent a la
+; posici√≥ que ocupa el cursor a la pantalla, cridant a la 
 ; subrutina calcIndexP1.
 ; En cas de que la casella no estigui oberta ni marcada mostrar:
 ;	- 'X' si hi ha una mina
 ;	- 'm' si volem marcar la casella
-;	- el numero de veÔns si obrim una casella sense mina 
+;	- el numero de ve√Øns si obrim una casella sense mina 
 ; En cas de que la casella estigui marcada mostrar:
 ;	- ' ' si volem desmarcar la casella
-; Mostrarem el contingut de la casella criant a la subrutina printch. L'Ìndex per
+; Mostrarem el contingut de la casella criant a la subrutina printch. L'√≠ndex per
 ; a accedir a la matriu mineField, el calcularem cridant a la subrutina calcIndexP1.
 ; No es pot obrir una casella que ja tenim oberta o marcada.
-; Cada vegada que marquem/desmarquem una casella, actualitzar el n˙mero de marques restants 
+; Cada vegada que marquem/desmarquem una casella, actualitzar el n√∫mero de marques restants 
 ; cridant a la subrutina updateMarks.
 ; Si obrim una casella amb mina actualitzar el valor endGame a -1.
-; Finalment, per al nivell avanÁat, si obrim una casella sense mina y amb 
-; 0 mines al voltant, cridarem a la subrutina openBorders del nivell avanÁat.
+; Finalment, per al nivell avan√ßat, si obrim una casella sense mina y amb 
+; 0 mines al voltant, cridarem a la subrutina openBorders del nivell avan√ßat.
 ;
 ; Variables utilitzades:	
 ; row       : fila per a accedir a la matriu mineField
 ; rowCur    : fila actual del cursor a la matriu
 ; col       : columna per a accedir a la matriu mineField
 ; colCur    : columna actual del cursor a la matriu 
-; indexMat  : Õndex per a accedir a la matriu mineField
+; indexMat  : √çndex per a accedir a la matriu mineField
 ; mineField : Matriu 8x8 on tenim les posicions de les mines. 
-; carac	    : car‡cter per a escriure a pantalla.
+; carac	    : car√†cter per a escriure a pantalla.
 ; taulell   : Matriu en la que anem indicant els valors de les nostres tirades 
 ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -382,19 +382,36 @@ openP1 proc
 
 
 marcar:
+   ; no marks left to be used
+   cmp [taulell + eax], 'm'
+   je undo_mark
+
+   cmp [marks], 0
+   jle bye
+
    mov [taulell + eax], 'm'
    mov [carac], 'm'
    call printch
    jmp bye
 
+undo_mark:
+   cmp [marks], 9
+   jge bye
+
+   mov [taulell + eax], ' '
+   mov [carac], ' '
+   call printch
+   jmp bye
+
 desmarcar:
   
-   mov bl, [mineField + eax]
-   cmp bl, 0
-   je no_minas
-   add bl, '0'
-   mov [carac], bl 
-   call printch
+   ;mov bl, [mineField + eax]
+   ;cmp bl, 0
+   ;je no_minas
+   ;add bl, '0'
+   ;mov [carac], bl 
+   ;call printch
+   call countMines
    jmp bye 
 
 
@@ -409,16 +426,16 @@ bye:
 openP1 endp
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; Subrutina que implementa líobertura continua de caselles. Síha díutilitzar
+; Subrutina que implementa l‚Äôobertura continua de caselles. S‚Äôha d‚Äôutilitzar
 ; la tecla espai per a obrir una casella i la 's' per a sortir. 
-; Per a cada moviment introduÔt comprovar si hem guanyat el joc cridant a 
-; la subrutina checkWin, o bÈ si hem perdut el joc (endGame!=0).
+; Per a cada moviment introdu√Øt comprovar si hem guanyat el joc cridant a 
+; la subrutina checkWin, o b√© si hem perdut el joc (endGame!=0).
 ;
 ; Variables utilitzades: 
-; carac2   : Car‡cter introduÔt per líusuari
+; carac2   : Car√†cter introdu√Øt per l‚Äôusuari
 ; rowCur   : Fila del cursor a la matriu mineField
 ; colCur   : Columna del cursor a la matriu mineField
-; row      : Fila per a accedir a la matriu mineField
+; row      : Fila per a accedir a la matriu mineFieldf
 ; col      : Columna per a accedir a la matriu mineField
 ; endGame  : flag per indicar si hem perdut (0=no hem perdut, 1=hem perdut)
 ;
@@ -437,9 +454,7 @@ repetir:
    jmp repetir
 
 
-   bye:
-
-	
+   bye:	
 
 	leave
 	ret
@@ -447,8 +462,8 @@ openContinuousP1 endp
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; 
 ; Modificar el nombre de marques encara disponibles. 
-; RecÛrrer el taullel per comptar les marques posades ('m') i restar aquest valor a les inicials (9). 
-; Imprimir el nou valor a la posiciÛ indicada (rowScreen = 3, colScreen = 57), tenint 
+; Rec√≥rrer el taullel per comptar les marques posades ('m') i restar aquest valor a les inicials (9). 
+; Imprimir el nou valor a la posici√≥ indicada (rowScreen = 3, colScreen = 57), tenint 
 ; en compte que hi haurem de sumar el valor '0' pel format ASCII. 
 ; 
 ; Variables utilitzades:  
@@ -472,19 +487,14 @@ bucle:
  xor eax, eax
  ;mov eax, [indexMat]
  cmp [taulell + ecx], 'm'
- je dec_mark
-dec_done:
- ;lahf ; load flags into AH
- ;shr eax, 6
- ;and eax, 01b 
- ;sub [marks], eax
+ lahf ; load flags into  AH ‚Üê EFLAGS(SF:ZF:0:AF:0:PF:1:CF);
+ shr eax, 14
+ and eax, 01b 
+ ; if ZF == 1 then EAX = 1
+ sub [marks], eax
 
  inc ecx
  jmp bucle
-
- dec_mark:
-   dec [marks]
-   jmp dec_done
 
 bye:
  mov [rowScreen], 3
@@ -499,6 +509,109 @@ bye:
  leave
  ret 
 updateMarks endp
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; 
+; Comptar el nombre de mines a les cel¬∑les ve√Ønes (les vuit del voltant).  
+; S'ha de comprovar que no accedim a posicions de fora el mineField per comptar les mines. 
+; Guardar el nombre de mines de les cel¬∑les a la variable neighbours. 
+; 
+; Variables utilitzades:  
+; taulell    : Matriu en la que anem indicant els valors de les nostres tirades  
+; mineField  : Matriu 8x8 on tenim les posicions de les mines.  
+; neighbours : Car√†cter introdu√Øt per l‚Äôusuari 
+; col        : Fila del cursor a la matriu mineField 
+; row        : Columna del cursor a la matriu mineField 
+; indexMat   : √çndex per a accedir a la matriu mineField 
+; 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; 
+countMines proc 
+ push ebp 
+ mov  ebp, esp 
+ ;esqDalt   dalt   dretDalt 
+ ;esq              dret 
+ ;esqBaix   baix   dretBaix 
+ 
+ xor edx, edx ; mines counter
+ xor ecx, ecx 
+ xor ebx, ebx 
+ 
+ mov cl, [col]
+ push ecx
+ cmp cl, 0
+ je iteration_1
+
+ dec cl
+ mov [col], cl
+ call calcIndexP1
+ mov eax, [indexMat]
+ mov bl, [mineField + eax]
+ add edx, bl
+
+ iteration_1:
+ 
+ pop ecx
+ mov [col], cl
+ call calcIndexP1
+ mov eax, [indexMat]
+ mov bl, [mineField + eax]
+ add edx, bl
+
+ iteration_2:
+
+ push ecx
+ cmp cl, 7
+ je iteration_3
+
+ inc ecx
+ mov [col], cl
+ call calcIndexP1
+ mov eax, [indexMat]
+ mov bl, [mineField + eax]
+ add edx, bl
+
+ iteration_3:
+
+
+
+
+ dec ecx
+
+ mov ebx, [row]
+ dec ebx
+
+
+next_col:
+ cmp ecx, 2
+ jge bye
+   
+next_row:
+   cmp ebx, 8
+   jge fi_row
+
+   mov [row], 0
+   mov [col], 0
+   call calcIndexP1
+   mov eax, [indexMat]
+
+   mov bl, [mineField + eax]
+   cmp bl, 1
+   lahf ; load flags into  AH ‚Üê EFLAGS(SF:ZF:0:AF:0:PF:1:CF);
+   shr eax, 14
+   and eax, 01b 
+   ; if ZF == 1 then EAX = 1
+   add edx, eax
+
+   inc ebx
+   jmp next_row
+fi_row:
+
+ inc ecx
+ jmp next_col   
+ bye:
+
+ leave
+ ret 
+countMines endp
 
 END
 

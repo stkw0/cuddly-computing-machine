@@ -28,7 +28,7 @@ extern "C" {
 	int printMenu_C();
 	int gotoxy_C(int row_num, int col_num);
 	char getch_C();
-	int printBoard_C(int tries);
+	void printBoard_C();
 	void continue_C();
 }
 
