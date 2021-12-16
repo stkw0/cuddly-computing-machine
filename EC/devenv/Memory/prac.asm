@@ -143,18 +143,19 @@ posCurScreenP1 proc
    push ebp
 	mov  ebp, esp
 
-   dec [row]
-   sub [col], 'A'
-   
-   shl [row], 1
-   shl [col], 2
-
-   mov ebx, [rowScreenIni]
-   add ebx, [row]
+   mov ebx, [row]
+   dec ebx
+   mov [row], ebx
+   shl ebx, 1
+   add ebx, [rowScreenIni]
    mov [rowScreen], ebx
 
-   mov ebx, [colScreenIni]
-   add bl, [col]
+   xor ebx, ebx
+   mov bl, [col]
+   sub bl, 'A'
+   mov [col], bl
+   shl bl, 2
+   add ebx, [colScreenIni]
    mov [colScreen], ebx
 
    call gotoxy
@@ -296,6 +297,7 @@ next_move:
 
    mov ebx, [rowCur]
    mov al, [colCur]
+
    mov [row], ebx
    mov [col], al
    call posCurScreenP1
@@ -326,10 +328,12 @@ calcIndexP1 proc
 
    mov eax, [row]
    mov bl, [col]
-   shr bl, 2
-   shl eax, 2
+   ;shr bl, 2
+   shl eax, 3
    add eax, ebx
    mov [indexMat], eax
+
+   bye:
 
 	leave
 	ret
@@ -530,84 +534,183 @@ countMines proc
  ;esqDalt   dalt   dretDalt 
  ;esq              dret 
  ;esqBaix   baix   dretBaix 
- 
- xor edx, edx ; mines counter
- xor ecx, ecx 
- xor ebx, ebx 
- 
- mov cl, [col]
- push ecx
- cmp cl, 0
- je iteration_1
 
- dec cl
- mov [col], cl
- call calcIndexP1
- mov eax, [indexMat]
- mov bl, [mineField + eax]
- add edx, bl
+; mines counter
+ xor edx, edx 
+ xor ecx, ecx
 
- iteration_1:
- 
- pop ecx
- mov [col], cl
- call calcIndexP1
- mov eax, [indexMat]
- mov bl, [mineField + eax]
- add edx, bl
+ xor ebx,ebx; flags
+ ; 0b0(no left) 0(no right) 0(no up) 0(no dowm) 
+ cmp [col], 0
+ jne skip_1
+ or ebx, 1000b
+ skip_1:
+ cmp [col], 7
+ jne skip_2
+ or ebx, 100b
+ skip_2:
+ cmp [row], 0
+ jne skip_3
+ or ebx, 10b
+ skip_3:
+ cmp [row], 7
+ jl skip_4
+ or ebx, 1b
+ skip_4:
 
- iteration_2:
+ push ebx
+ call cmp_leftUp
+ pop ebx
+ push ebx
+ call cmp_leftMid
+ pop ebx
+ push ebx
+ call cmp_leftBelow
+  pop ebx
+ push ebx
+ call cmp_rightUp
+  pop ebx
+ push ebx
+ call cmp_rightMid
+  pop ebx
+ push ebx
+ call cmp_rightBelow
+ pop ebx
+ push ebx 
+ call cmp_up
+ pop ebx
+  push ebx 
+ call cmp_down
+ pop ebx
 
- push ecx
- cmp cl, 7
- je iteration_3
+ jmp end_count
 
- inc ecx
- mov [col], cl
- call calcIndexP1
- mov eax, [indexMat]
- mov bl, [mineField + eax]
- add edx, bl
+ cmp_leftUp:
+    and ebx, 1010b
+    jnz exit_0
 
- iteration_3:
+    dec [col]
+    dec [row]
+    call calcIndexP1
+    mov eax, [indexMat]
+    mov cl, [mineField + eax]
+    add edx, ecx
+    inc [row]
+    inc [col]
+
+    exit_0:
+    ret
+
+ cmp_leftMid:
+    and ebx, 1000b
+    jnz exit_1
+
+    dec [col]
+    call calcIndexP1
+    mov eax, [indexMat]
+    mov cl, [mineField + eax]
+    add edx, ecx
+    inc [col]
+
+    exit_1:
+    ret
+
+ cmp_leftBelow:
+    and ebx, 1001b
+    jnz exit_2
+
+    dec [col]
+    inc [row]
+    call calcIndexP1
+    mov eax, [indexMat]
+    mov cl, [mineField + eax]
+    add edx, ecx
+    inc [col]
+    dec [row]
+
+    exit_2:
+    ret
+
+ cmp_rightUp:
+    and ebx, 0110b
+    jnz exit_3
+
+    inc [col]
+    dec [row]
+    call calcIndexP1
+    mov eax, [indexMat]
+    mov cl, [mineField + eax]
+    add edx, ecx
+    dec [col]
+    inc [row]
+
+    exit_3:
+    ret
+
+ cmp_rightMid:
+    and ebx, 0100b
+    jnz exit_4
+
+    inc [col]
+    call calcIndexP1
+    mov eax, [indexMat]
+    mov cl, [mineField + eax]
+    add edx, ecx
+    dec [col]
+
+    exit_4:
+    ret
+
+ cmp_rightBelow:
+    and ebx, 0101b
+    jnz exit_5
+
+    inc [col]
+    inc [row]
+    call calcIndexP1
+    mov eax, [indexMat]
+    mov cl, [mineField + eax]
+    add edx, ecx
+    dec [col]
+    dec [row]
+
+    exit_5:
+    ret
+
+ cmp_up:
+    and ebx, 10b
+    jnz exit_6
+
+    dec [row]
+    call calcIndexP1
+    mov eax, [indexMat]
+    mov cl, [mineField + eax]
+    add edx, ecx
+    inc [row]
+
+    exit_6:
+    ret
+
+ cmp_down:
+    and ebx, 1b
+    jnz exit_7
+
+    inc [row]
+    call calcIndexP1
+    mov eax, [indexMat]
+    mov cl, [mineField + eax]
+    add edx, ecx
+    dec [row]
+
+    exit_7:
+    ret
 
 
+ end_count:
 
-
- dec ecx
-
- mov ebx, [row]
- dec ebx
-
-
-next_col:
- cmp ecx, 2
- jge bye
-   
-next_row:
-   cmp ebx, 8
-   jge fi_row
-
-   mov [row], 0
-   mov [col], 0
-   call calcIndexP1
-   mov eax, [indexMat]
-
-   mov bl, [mineField + eax]
-   cmp bl, 1
-   lahf ; load flags into  AH ← EFLAGS(SF:ZF:0:AF:0:PF:1:CF);
-   shr eax, 14
-   and eax, 01b 
-   ; if ZF == 1 then EAX = 1
-   add edx, eax
-
-   inc ebx
-   jmp next_row
-fi_row:
-
- inc ecx
- jmp next_col   
- bye:
+add edx, '0' 
+mov [carac], dl
+call printch
 
  leave
  ret 
