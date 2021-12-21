@@ -323,6 +323,7 @@ movContinuoP1 endp
 calcIndexP1 proc
 	push ebp
 	mov  ebp, esp
+   push ebx
 
    xor ebx, ebx
 
@@ -334,6 +335,8 @@ calcIndexP1 proc
    mov [indexMat], eax
 
    bye:
+   
+   pop ebx
 
 	leave
 	ret
@@ -558,35 +561,19 @@ countMines proc
  or ebx, 1b
  skip_4:
 
- push ebx
  call cmp_leftUp
- pop ebx
- push ebx
  call cmp_leftMid
- pop ebx
- push ebx
  call cmp_leftBelow
-  pop ebx
- push ebx
  call cmp_rightUp
-  pop ebx
- push ebx
  call cmp_rightMid
-  pop ebx
- push ebx
  call cmp_rightBelow
- pop ebx
- push ebx 
  call cmp_up
- pop ebx
-  push ebx 
  call cmp_down
- pop ebx
 
  jmp end_count
 
  cmp_leftUp:
-    and ebx, 1010b
+    test ebx, 1010b
     jnz exit_0
 
     dec [col]
@@ -602,7 +589,7 @@ countMines proc
     ret
 
  cmp_leftMid:
-    and ebx, 1000b
+    test ebx, 1000b
     jnz exit_1
 
     dec [col]
@@ -616,7 +603,7 @@ countMines proc
     ret
 
  cmp_leftBelow:
-    and ebx, 1001b
+    test ebx, 1001b
     jnz exit_2
 
     dec [col]
@@ -632,7 +619,7 @@ countMines proc
     ret
 
  cmp_rightUp:
-    and ebx, 0110b
+    test ebx, 0110b
     jnz exit_3
 
     inc [col]
@@ -648,7 +635,7 @@ countMines proc
     ret
 
  cmp_rightMid:
-    and ebx, 0100b
+    test ebx, 0100b
     jnz exit_4
 
     inc [col]
@@ -662,7 +649,7 @@ countMines proc
     ret
 
  cmp_rightBelow:
-    and ebx, 0101b
+    test ebx, 0101b
     jnz exit_5
 
     inc [col]
@@ -678,7 +665,7 @@ countMines proc
     ret
 
  cmp_up:
-    and ebx, 10b
+    test ebx, 10b
     jnz exit_6
 
     dec [row]
@@ -692,7 +679,7 @@ countMines proc
     ret
 
  cmp_down:
-    and ebx, 1b
+    test ebx, 1b
     jnz exit_7
 
     inc [row]
